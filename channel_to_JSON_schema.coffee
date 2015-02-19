@@ -34,18 +34,6 @@ class ParseChannelSchemaToJSONSchema
 
       (resourceProperties)
 
-    #resource.push
-
-    # _.each channel.application.resources, (resource) =>
-    #   unless resource.params
-    #     resource.params = []
-    #   @names = _.pluck resource.params, 'name'
-    #   _.map @names, (name) =>
-    #     resource.properties = resource.params.push resource.params[name]
-    #     resource.properties = {'displayName': resource.params.displayName,'type': resource.params.type, 'style': resource.params.style}
-    #     resource.properties.push
-    #     console.log(resource)
-
     prettyChannel = JSON.stringify channel, null, 2
     fs.writeFileSync @channel_outfile, prettyChannel
     console.log(prettyChannel)
