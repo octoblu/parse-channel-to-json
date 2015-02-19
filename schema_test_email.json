@@ -39,13 +39,8 @@
             "hidden": true,
             "style": "body",
             "default": "{{flow.flowId}}"
-          },
-          null,
-          null,
-          null,
-          null
-        ],
-        "properties": 8
+          }
+        ]
       }
     ]
   }

@@ -5,33 +5,59 @@ commander = require 'commander'
 
 class ParseChannelSchemaToJSONSchema
   constructor: (options={}) ->
-    @channel_filename = options.channel_filename
+    @channel_infile = options.channel_infile
+    @channel_outfile = options.channel_outfile
 
   channel: =>
-    JSON.parse fs.readFileSync @channel_filename
+    console.log @channel_infile
+    JSON.parse fs.readFileSync @channel_infile
 
   run: =>
     channel = @channel()
-    matches = []
 
-    _.each channel.application.resources, (resource) =>
-      unless resource.params
-        resource.params = []
-      @names = _.pluck resource.params, 'name'
-      _.each @names, (name) =>
-        resource.properties = resource.params.push resource.params[name]
-        resource.properties[name] = {'displayName': resource.params.displayName,'type': resource.params.type, 'style': resource.params.style}
-        console.log(resource)
+    _.each channel.application.resources, (resource) => 
+      resourceProperties = _.map resource.params, (param) => 
+         resourceProperty = {}
+         resourceProperty[param.name] = {
+           type : param.type, 
+           description : param.displayName, 
+           style : param.style, 
+           required : true,
+         }
+         if param.hidden
+          resourceProperty[param.name].hidden = param.hidden
+
+         if param.default
+          resourceProperty[param.name].default = param.default
+
+         resourceProperty
+
+      (resourceProperties)
+
+    #resource.push
+
+    # _.each channel.application.resources, (resource) =>
+    #   unless resource.params
+    #     resource.params = []
+    #   @names = _.pluck resource.params, 'name'
+    #   _.map @names, (name) =>
+    #     resource.properties = resource.params.push resource.params[name]
+    #     resource.properties = {'displayName': resource.params.displayName,'type': resource.params.type, 'style': resource.params.style}
+    #     resource.properties.push
+    #     console.log(resource)
 
     prettyChannel = JSON.stringify channel, null, 2
-    fs.writeFileSync @channel_filename, prettyChannel
+    fs.writeFileSync @channel_outfile, prettyChannel
+    console.log(prettyChannel)
 
 commander
   .version 0.1
-  .option '-f, --filename [path]',  'Path to the channel file to augment'
+  .option '-i, --infile [path]',  'Path to the channel file to input'
+  .option '-o, --outfile [path]',  'Path to the channel file to output'
   .parse(process.argv);
 
-commander.help() unless commander.filename?
+commander.help() unless commander.infile?
 
-converter = new ParseChannelSchemaToJSONSchema channel_filename: commander.filename
+converter = new ParseChannelSchemaToJSONSchema channel_infile: commander.infile?,
+  channel_outfile: commander.outfile?
 converter.run()
