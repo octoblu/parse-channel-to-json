@@ -11,10 +11,10 @@
     "resources": [
       {
         "url": "http://email.octoblu.com/messages",
-        "displayName": "Send Email",
         "path": "/messages",
         "httpMethod": "POST",
-        "params": [
+        "description": "Send Email",
+        "properties": [
           {
             "to": {
               "type": "string",

@@ -1,4 +1,3 @@
-#!/usr/bin/env coffee
 fs = require 'fs'
 _  = require 'lodash'
 commander = require 'commander'
@@ -18,7 +17,7 @@ class ParseChannelSchemaToJSONSchema
     channel = @channel()
 
     _.each channel.application.resources, (resource) => 
-      #if url
+      
       resourceParams = _.map resource.params, (param) => 
          resourceParam = {}
          resourceParam[param.name] = {
@@ -35,9 +34,14 @@ class ParseChannelSchemaToJSONSchema
 
          if param.default
           resourceParam[param.name].default = param.default
+
          resourceParam
-    
-      resource.params = resourceParams
+
+      resource.description = resource.displayName
+      delete resource.displayName
+
+      resource.params = resource.properties  
+      resource.properties = resourceParams
       console.log resourceParams
 
     prettyChannel = JSON.stringify channel, null, 2
