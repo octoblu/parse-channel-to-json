@@ -5,8 +5,10 @@ commander = require 'commander'
 
 class ParseChannelSchemaToJSONSchema
   constructor: (options={}) ->
-    @channel_infile = options.channel_infile
-    @channel_outfile = options.channel_outfile
+    @channel_infile = "schema_test_email.json"
+    #options.channel_infile
+    @channel_outfile = "schema_test_email_new.json"
+    #options.channel_outfile
 
   channel: =>
     console.log @channel_infile
@@ -31,8 +33,8 @@ class ParseChannelSchemaToJSONSchema
           resourceProperty[param.name].default = param.default
 
          resourceProperty
-
-      (resourceProperties)
+      channel.application.resources = resourceProperties
+      console.log resourceProperties
 
     prettyChannel = JSON.stringify channel, null, 2
     fs.writeFileSync @channel_outfile, prettyChannel
