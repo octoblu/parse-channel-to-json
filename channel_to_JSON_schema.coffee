@@ -18,23 +18,27 @@ class ParseChannelSchemaToJSONSchema
     channel = @channel()
 
     _.each channel.application.resources, (resource) => 
-      resourceProperties = _.map resource.params, (param) => 
-         resourceProperty = {}
-         resourceProperty[param.name] = {
+      #if url
+      resourceParams = _.map resource.params, (param) => 
+         resourceParam = {}
+         resourceParam[param.name] = {
            type : param.type, 
            description : param.displayName, 
            style : param.style, 
-           required : true,
          }
+
+         if param.required
+          resourceParam[param.required].required = param.required
+
          if param.hidden
-          resourceProperty[param.name].hidden = param.hidden
+          resourceParam[param.name].hidden = param.hidden
 
          if param.default
-          resourceProperty[param.name].default = param.default
-
-         resourceProperty
-      channel.application.resources = resourceProperties
-      console.log resourceProperties
+          resourceParam[param.name].default = param.default
+         resourceParam
+    
+      resource.params = resourceParams
+      console.log resourceParams
 
     prettyChannel = JSON.stringify channel, null, 2
     fs.writeFileSync @channel_outfile, prettyChannel
