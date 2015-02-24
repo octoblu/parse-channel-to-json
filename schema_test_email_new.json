@@ -7,45 +7,47 @@
   "name": "Send Email",
   "type": "channel:email",
   "application": {
-    "base": "http://email.octoblu.com",
-    "resources": [
-      {
-        "url": "http://email.octoblu.com/messages",
-        "path": "/messages",
-        "httpMethod": "POST",
-        "description": "Send Email",
-        "properties": [
-          {
-            "to": {
-              "type": "string",
-              "description": "To",
-              "style": "body"
+    "properties": {
+      "base": "http://email.octoblu.com",
+      "properties": [
+        {
+          "url": "http://email.octoblu.com/messages",
+          "path": "/messages",
+          "httpMethod": "POST",
+          "description": "Send Email",
+          "properties": [
+            {
+              "to": {
+                "type": "string",
+                "description": "To",
+                "style": "body"
+              }
+            },
+            {
+              "subject": {
+                "type": "string",
+                "description": "Subject ( Add data to subject using {{payload.values}} )",
+                "style": "body"
+              }
+            },
+            {
+              "body": {
+                "type": "string",
+                "description": "Body ( Add data to body using {{payload.values}} )",
+                "style": "body"
+              }
+            },
+            {
+              "flowId": {
+                "type": "string",
+                "style": "body",
+                "hidden": true,
+                "default": "{{flow.flowId}}"
+              }
             }
-          },
-          {
-            "subject": {
-              "type": "string",
-              "description": "Subject ( Add data to subject using {{payload.values}} )",
-              "style": "body"
-            }
-          },
-          {
-            "body": {
-              "type": "string",
-              "description": "Body ( Add data to body using {{payload.values}} )",
-              "style": "body"
-            }
-          },
-          {
-            "flowId": {
-              "type": "string",
-              "style": "body",
-              "hidden": true,
-              "default": "{{flow.flowId}}"
-            }
-          }
-        ]
-      }
-    ]
+          ]
+        }
+      ]
+    }
   }
 }
