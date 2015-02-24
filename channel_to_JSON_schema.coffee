@@ -3,14 +3,12 @@ _  = require 'lodash'
 commander = require 'commander'
 
 class ParseChannelSchemaToJSONSchema
-  constructor: (options={}) ->
-    @channel_infile = "schema_test_email.json"
-    #options.channel_infile
-    @channel_outfile = "schema_test_email_new.json"
-    #options.channel_outfile
+  constructor: () ->
+    @channel_infile = commander.infile
+    @channel_outfile = commander.outfile
 
   channel: =>
-    #console.log @channel_infile
+    console.log typeof @channel_infile
     JSON.parse fs.readFileSync @channel_infile
 
   run: =>
@@ -68,8 +66,8 @@ class ParseChannelSchemaToJSONSchema
 
 commander
   .version 0.1
-  .option '-i, --infile [path]',  'Path to the channel file to input'
-  .option '-o, --outfile [path]',  'Path to the channel file to output'
+  .option('-i, --infile [path]',  'Path to the channel file to input')
+  .option('-o, --outfile [path]',  'Path to the channel file to output')
   .parse(process.argv);
 
 commander.help() unless commander.infile?
