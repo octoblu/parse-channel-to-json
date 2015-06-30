@@ -1,73 +1,103 @@
+#!/usr/bin/env coffee
+
+#{
+#    "type": "object",
+#    "properties": {
+#      "on": {
+#        "type": "boolean",
+#        "required": true,
+#        "default": false
+#      },
+#      "color": {
+#        "type": "string",
+#        "required": true
+#      }
+#    }
+#  }
+
+
 fs = require 'fs'
 _  = require 'lodash'
 commander = require 'commander'
+debug = require('debug')('channel-to-json-schema')
 
 class ParseChannelSchemaToJSONSchema
   constructor: () ->
     @channel_infile = commander.infile
     @channel_outfile = commander.outfile
+    @channel_form_outfile = commander.form
 
   channel: =>
-    console.log typeof @channel_infile
     JSON.parse fs.readFileSync @channel_infile
 
   run: =>
+    newForm = []
+    newChannel =
+      type: 'object'
+      properties: {}
     channel = @channel()
 
-    _.each channel.application.resources, (resource) => 
-        
-      resourceParams = _.map resource.params, (param) => 
-         resourceParam = {}
-         resourceParam[param.name] = {
-           type : param.type, 
-           description : param.displayName, 
-           style : param.style, 
-         }
+    newChannel.properties.url =
+      type: 'string'
+      enum: _.pluck channel.application.resources, 'url'
 
-         if param.required
-          resourceParam[param.required].required = param.required
+    form =
+      key: 'url'
+      title: 'Endpoint'
+      titleMap: []
 
-         if param.hidden
-          resourceParam[param.name].hidden = param.hidden
+    _.each channel.application.resources, (resource) =>
+      form.titleMap.push {value: resource.url, name: resource.displayName}
 
-         if param.default
-          resourceParam[param.name].default = param.default
+    newForm.push form
 
-         resourceParam
+    _.each channel.application.resources, (resource) =>
+      newForm.push
+        type: "help"
+        helpvalue: "#{resource.httpMethod.toLocaleUpperCase()} #{resource.url}"
+        condition: "model.url === '#{resource.url}'"
 
-      #resource[resource.displayName] = {
-       # type: "string",
-        #description: "The displayName of this resource."
-      #}
+      _.each resource.params, (param) =>
+        newName = "#{resource.url}##{param.name}"
+        newForm.push @convertFormParam param, resource.url
+        newChannel.properties[newName] = @convertParam param
 
-      resource.description = resource.displayName
-      delete resource.displayName
+    @writeOutput newChannel
+    @writeForm newForm
 
-      resource.params = resource.properties  
-      resource.properties = resourceParams
-      console.log resourceParams
+  convertParam: (param) =>
+    resourceParam =
+      type: param.type
+      description: param.displayName
+      required: param.required
 
-    _.each channel, (application) =>
-      
-      application.properties = {
-        base: application.base,
-        properties: application.resources
-      }
+  convertFormParam: (param, url) =>
+    formParam =
+      key: "#{url}##{param.name}"
+      title: param.displayName
+      condition: "model.url === '#{url}'"
 
-      delete application.base
-      delete application.resources
-      #delete application.resources
+    if param.hidden?
+      formParam.type = 'hidden'
+      formParam.notitle = true
 
-      console.log application.base
+    formParam
 
+  writeOutput: (channel) =>
     prettyChannel = JSON.stringify channel, null, 2
     fs.writeFileSync @channel_outfile, prettyChannel
-    console.log(prettyChannel)
+    debug 'channel output:', prettyChannel
+
+  writeForm: (form) =>
+    prettyForm = JSON.stringify form, null, 2
+    fs.writeFileSync @channel_form_outfile, prettyForm
+    debug 'form output:', prettyForm
 
 commander
   .version 0.1
   .option('-i, --infile [path]',  'Path to the channel file to input')
   .option('-o, --outfile [path]',  'Path to the channel file to output')
+  .option('-f, --form [path]',  'Path to the schema form file to output')
   .parse(process.argv);
 
 commander.help() unless commander.infile?
