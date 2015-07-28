@@ -58,7 +58,7 @@ class ParseChannelSchemaToJSONSchema
         condition: "model.url === '#{resource.url}'"
 
       _.each resource.params, (param) =>
-        newName = "#{resource.url}##{param.name}"
+        newName = "#{@sanitizeUrl(resource.url)}##{param.name}"
         newForm.push @convertFormParam param, resource.url
         newChannel.properties[newName] = @convertParam param
 
@@ -73,7 +73,7 @@ class ParseChannelSchemaToJSONSchema
 
   convertFormParam: (param, url) =>
     formParam =
-      key: "#{url}##{param.name}"
+      key: "#{@sanitizeUrl(url)}##{param.name}"
       title: param.displayName
       condition: "model.url === '#{url}'"
 
@@ -82,6 +82,9 @@ class ParseChannelSchemaToJSONSchema
       formParam.notitle = true
 
     formParam
+
+  sanitizeUrl: (url) =>
+    url.replace(/\./g, '-')
 
   writeOutput: (channel) =>
     prettyChannel = JSON.stringify channel, null, 2
