@@ -37,29 +37,41 @@ class ParseChannelSchemaToJSONSchema
       properties: {}
     channel = @channel()
 
+    _.each channel.application.resources, (resource) =>
+      resource.method = resource.httpMethod.toLocaleUpperCase()
+
+    newChannel.properties.endpoint =
+      type: 'object'
+      enum: _.map channel.application.resources, (resource) =>
+        _.pick resource, ['url', 'method']
+
     newChannel.properties.url =
       type: 'string'
-      enum: _.pluck channel.application.resources, 'url'
+      required: true
+
+    newChannel.properties.method =
+      type: 'string'
+      required: true
 
     form =
-      key: 'url'
+      key: 'endpoint'
       title: 'Endpoint'
       titleMap: []
 
     _.each channel.application.resources, (resource) =>
-      form.titleMap.push {value: resource.url, name: resource.displayName}
+      form.titleMap.push {value: "#{resource.method}-#{resource.url}", name: resource.displayName}
 
     newForm.push form
 
     _.each channel.application.resources, (resource) =>
       newForm.push
         type: "help"
-        helpvalue: "#{resource.httpMethod.toLocaleUpperCase()} #{resource.url}"
-        condition: "model.url === '#{resource.url}'"
+        helpvalue: "#{resource.method.toLocaleUpperCase()} #{resource.url}"
+        condition: "model.url === '#{resource.url} && model.method === '#{resource.method}''"
 
       _.each resource.params, (param) =>
-        newName = "#{@sanitizeUrl(resource.url)}##{param.name}"
-        newForm.push @convertFormParam param, resource.url
+        newName = "#{resource.method}-#{@sanitizeUrl(resource.url)}##{param.name}"
+        newForm.push @convertFormParam param, resource.url, resource.method
         newChannel.properties[newName] = @convertParam param
 
     @writeOutput newChannel
@@ -71,11 +83,11 @@ class ParseChannelSchemaToJSONSchema
       description: param.displayName
       required: param.required
 
-  convertFormParam: (param, url) =>
+  convertFormParam: (param, url, method) =>
     formParam =
-      key: "#{@sanitizeUrl(url)}##{param.name}"
+      key: "#{method}-#{@sanitizeUrl(url)}##{param.name}"
       title: param.displayName
-      condition: "model.url === '#{url}'"
+      condition: "model.url === '#{url}' && model.method === '#{method}'"
 
     if param.hidden?
       formParam.type = 'hidden'
