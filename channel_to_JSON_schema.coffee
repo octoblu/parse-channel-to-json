@@ -41,17 +41,19 @@ class ParseChannelSchemaToJSONSchema
       resource.method = resource.httpMethod.toLocaleUpperCase()
 
     newChannel.properties.endpoint =
-      type: 'object'
+      type: 'string'
       enum: _.map channel.application.resources, (resource) =>
-        _.pick resource, ['url', 'method']
+        "#{resource.method}-#{resource.url}"
 
     newChannel.properties.url =
       type: 'string'
       required: true
+      enum: _.uniq _.pluck channel.application.resources, 'url'
 
     newChannel.properties.method =
       type: 'string'
       required: true
+      enum: _.uniq _.pluck channel.application.resources, 'method'
 
     form =
       key: 'endpoint'
@@ -67,7 +69,7 @@ class ParseChannelSchemaToJSONSchema
       newForm.push
         type: "help"
         helpvalue: "#{resource.method.toLocaleUpperCase()} #{resource.url}"
-        condition: "model.url === '#{resource.url} && model.method === '#{resource.method}''"
+        condition: "model.url === '#{resource.url}' && model.method === '#{resource.method}'"
 
       _.each resource.params, (param) =>
         newName = "#{resource.method}-#{@sanitizeUrl(resource.url)}##{param.name}"
