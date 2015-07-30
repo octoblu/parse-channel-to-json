@@ -1,35 +1,93 @@
 #!/usr/bin/env coffee
 
-#{
-#    "type": "object",
-#    "properties": {
-#      "on": {
-#        "type": "boolean",
-#        "required": true,
-#        "default": false
-#      },
-#      "color": {
-#        "type": "string",
-#        "required": true
-#      }
-#    }
-#  }
-
-
 fs = require 'fs'
 _  = require 'lodash'
 commander = require 'commander'
 debug = require('debug')('channel-to-json-schema')
 
 class ParseChannelSchemaToJSONSchema
-  constructor: () ->
+  constructor: ->
     @channel_infile = commander.infile
-    @channel_outfile = commander.outfile
-    @channel_form_outfile = commander.form
+    @messageSchemaFile = commander.outfile
+    @formFile = commander.form
+    @channelConfigFile = commander.channelConfig
 
   channel: =>
     JSON.parse fs.readFileSync @channel_infile
 
+  run2: =>
+    channel = @channel()
+    messageSchema = @getMessageSchema channel.application.resources
+    form = @getForm channel.application.resources
+    channelConfig = @getChannelConfig channel
+
+    @writeMessageSchema messageSchema
+    @writeForm form
+    @writeChannelConfig channelConfig
+
+  writeMessageSchema: (messageSchema) =>
+    prettyMessageSchema = JSON.stringify(messageSchema, null, 2)
+    fs.writeFileSync @messageSchemaFile, prettyMessageSchema
+    debug 'message schema:', prettyMessageSchema
+
+  writeForm: (form) =>
+    prettyForm = JSON.stringify(form, null, 2)
+    fs.writeFileSync @formFile, prettyForm
+    debug 'form:', prettyForm
+
+  writeChannelConfig: (channelConfig) =>
+    prettyChannelConfig = JSON.stringify(channelConfig, null, 2)
+    fs.writeFileSync @channelConfigFile, prettyChannelConfig
+    debug 'form:', prettyChannelConfig
+
+  getMessageSchema : (resources)=>
+    actions = _.pluck resources, 'action'
+    messageSchema =
+      type: 'object'
+      properties:
+          action:
+            type: "string"
+            enum : actions
+
+    _.each actions, (action) =>
+      actionProperties = @getActionProperties resources, action
+      messageSchema.properties[action] =
+        type: "object"
+        properties: actionProperties
+
+    messageSchema
+
+  getForm: (resources) =>
+    form = _.map resources, @getFormFromResource
+    actionForm =
+      key: 'action'
+      title: 'Action'
+      titleMap: @getActionTitleMap resources
+
+    form.unshift actionForm
+
+    form
+
+  getFormFromResource: (resource) =>
+    key: "#{resource.action}"
+    notitle: true
+    condition: "model.action === '#{resource.action}'"
+
+
+  getActionTitleMap: (resources) =>
+    _.map resources, (resource) =>
+      value: resource.action, name: resource.displayName
+
+  getActionProperties: (resources, action) =>
+    resource = _.findWhere resources, action: action
+    properties = {}
+    _.each resource.params, (param) =>
+      properties["#{@sanitizeParam param.name}"] = @convertParam param
+
+    properties
+
+  getChannelConfig: =>
+    "I'm empty"
   run: =>
     newForm = []
     newChannel =
@@ -105,12 +163,12 @@ class ParseChannelSchemaToJSONSchema
 
   writeOutput: (channel) =>
     prettyChannel = JSON.stringify channel, null, 2
-    fs.writeFileSync @channel_outfile, prettyChannel
+    fs.writeFileSync @messageSchemaFile, prettyChannel
     debug 'channel output:', prettyChannel
 
   writeForm: (form) =>
     prettyForm = JSON.stringify form, null, 2
-    fs.writeFileSync @channel_form_outfile, prettyForm
+    fs.writeFileSync @formFile, prettyForm
     debug 'form output:', prettyForm
 
 commander
@@ -118,10 +176,11 @@ commander
   .option('-i, --infile [path]',  'Path to the channel file to input')
   .option('-o, --outfile [path]',  'Path to the channel file to output')
   .option('-f, --form [path]',  'Path to the schema form file to output')
+  .option('-c, --channel-config [path]',  'Path to the channel-config file to output')
   .parse(process.argv);
 
 commander.help() unless commander.infile?
 
 converter = new ParseChannelSchemaToJSONSchema channel_infile: commander.infile?,
-  channel_outfile: commander.outfile?
-converter.run()
+  messageSchemaFile: commander.outfile?
+converter.run2()
