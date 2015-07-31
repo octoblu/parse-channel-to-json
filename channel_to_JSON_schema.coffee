@@ -85,6 +85,8 @@ class ParseChannelSchemaToJSONSchema
       key: "#{action}.#{@sanitizeParam param.name}"
       title: param.displayName
       condition: "model.action === '#{action}'"
+      required: param.required
+
     if param.hidden?
       formParam.type = 'hidden'
       formParam.notitle = true
@@ -105,7 +107,7 @@ class ParseChannelSchemaToJSONSchema
     properties
 
   getChannelConfig: =>
-    "I'm empty"
+    "I'm empty. I really should be doing something with all the http data"
 
   convertParam: (param) =>
     resourceParam =
