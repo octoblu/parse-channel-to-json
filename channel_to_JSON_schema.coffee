@@ -72,7 +72,7 @@ class ParseChannelSchemaToJSONSchema
     form = [
       key: "#{resource.action}"
       notitle: true
-      condition: "model.action === '#{resource.action}'"
+      type: 'hidden'
     ]
 
     _.each resource.params, (param) =>
@@ -83,7 +83,7 @@ class ParseChannelSchemaToJSONSchema
   getFormFromParam: (action, param) =>
     formParam =
       key: "#{action}.#{@sanitizeParam param.name}"
-      title: "#{action}.#{@sanitizeParam param.name}"
+      title: param.displayName
       condition: "model.action === '#{action}'"
     if param.hidden?
       formParam.type = 'hidden'
