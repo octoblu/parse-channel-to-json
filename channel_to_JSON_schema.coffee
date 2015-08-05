@@ -10,7 +10,6 @@ class ParseChannelSchemaToJSONSchema
     @channelFile = commander.infile
     @messageSchemaFile = commander.outfile
     @formFile = commander.form
-    @channelConfigFile = commander.channelConfig
 
   channel: =>
     JSON.parse fs.readFileSync @channelFile
@@ -19,11 +18,9 @@ class ParseChannelSchemaToJSONSchema
     channel = @channel()
     messageSchema = @getMessageSchema channel.application.resources
     form = @getForm channel.application.resources
-    channelConfig = @getChannelConfig channel
 
     @writeMessageSchema messageSchema
     @writeForm form
-    @writeChannelConfig channelConfig
 
   writeMessageSchema: (messageSchema) =>
     prettyMessageSchema = JSON.stringify(messageSchema, null, 2)
@@ -35,23 +32,18 @@ class ParseChannelSchemaToJSONSchema
     fs.writeFileSync @formFile, prettyForm
     debug 'form:', prettyForm
 
-  writeChannelConfig: (channelConfig) =>
-    prettyChannelConfig = JSON.stringify(channelConfig, null, 2)
-    fs.writeFileSync @channelConfigFile, prettyChannelConfig
-    debug 'channel config:', prettyChannelConfig
-
   getMessageSchema : (resources)=>
-    actions = _.pluck resources, 'action'
+    subschemas = _.pluck resources, 'subschema'
     messageSchema =
       type: 'object'
       properties:
-        action:
+        subschema:
           type: "string"
-          enum : actions
+          enum : subschemas
 
-    _.each actions, (action) =>
-      actionProperties = @getActionProperties resources, action
-      messageSchema.properties[action] =
+    _.each subschemas, (subschema) =>
+      actionProperties = @getSubschemaProperties resources, subschema
+      messageSchema.properties[subschema] =
         type: "object"
         properties: actionProperties
 
@@ -59,9 +51,9 @@ class ParseChannelSchemaToJSONSchema
 
   getForm: (resources) =>
     form = [
-      key: 'action'
+      key: 'subschema'
       title: 'Action'
-      titleMap: @getActionTitleMap resources
+      titleMap: @getSubschemaTitleMap resources
     ]
 
     resourceForms = _.flatten( _.map resources, @getFormFromResource )
@@ -70,21 +62,21 @@ class ParseChannelSchemaToJSONSchema
 
   getFormFromResource: (resource) =>
     form = [
-      key: "#{resource.action}"
+      key: "#{resource.subschema}"
       notitle: true
       type: 'hidden'
     ]
 
     _.each resource.params, (param) =>
-      form.push(@getFormFromParam resource.action, param)
+      form.push(@getFormFromParam resource.subschema, param)
 
     form
 
-  getFormFromParam: (action, param) =>
+  getFormFromParam: (subschema, param) =>
     formParam =
-      key: "#{action}.#{@sanitizeParam param.name}"
+      key: "#{subschema}.#{@sanitizeParam param.name}"
       title: param.displayName
-      condition: "model.action === '#{action}'"
+      condition: "model.subschema === '#{subschema}'"
       required: param.required
 
     if param.hidden?
@@ -93,21 +85,17 @@ class ParseChannelSchemaToJSONSchema
 
     formParam
 
-
-  getActionTitleMap: (resources) =>
+  getSubschemaTitleMap: (resources) =>
     _.map resources, (resource) =>
-      value: resource.action, name: resource.displayName
+      value: resource.subschema, name: resource.displayName
 
-  getActionProperties: (resources, action) =>
-    resource = _.findWhere resources, action: action
+  getSubschemaProperties: (resources, subschema) =>
+    resource = _.findWhere resources, subschema: subschema
     properties = {}
     _.each resource.params, (param) =>
       properties["#{@sanitizeParam param.name}"] = @convertParam param
 
     properties
-
-  getChannelConfig: =>
-    "I'm empty. I really should be doing something with all the http data"
 
   convertParam: (param) =>
     resourceParam =
@@ -148,7 +136,6 @@ commander
   .option '-i, --infile [path]',  'Path to the channel file to input'
   .option '-o, --outfile [path]',  'Path to the channel file to output'
   .option '-f, --form [path]',  'Path to the schema form file to output'
-  .option '-c, --channel-config [path]',  'Path to the channel-config file to output'
   .parse process.argv
 
 commander.help() unless commander.infile?

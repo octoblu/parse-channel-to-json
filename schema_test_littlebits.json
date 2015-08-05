@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "properties": {
+    "action" : {
+      "type" : "string",
+      "enum": [
+        "getDevices",
+        "getDevice",
+        "activateDevice",
+        "updateDevice",
+        "deleteDevice",
+        "getSubscriptions",
+        "createSubscription",
+        "sendEventToSubscribers",
+        "deleteSubscription"
+      ]
+    },
+    "getDevices": {
+      "type": "object",
+      "properties": {}
+    },
+    "getDevice": {
+      "type": "object",
+      "properties": {
+        "deviceId" : {
+          "type": "string"
+        }
+      }
+    },
+    "updateDevice": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "activateDevice" : {
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "type": ""
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    }
+  }

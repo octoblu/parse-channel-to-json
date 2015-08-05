@@ -1,0 +1,108 @@
+[
+  {
+    "key": "action",
+    "title": "Action",
+    "titleMap": [
+      {
+        "value": "getDevice",
+        "name": "Returns An Array Of Device Objects"
+      },
+      {
+        "value": "sendEventToSubscribers",
+        "name": "Post Devices Output"
+      },
+      {
+        "value": "getSubscriptions",
+        "name": "Gets An Array Of Subscription Objects"
+      },
+      {
+        "value": "deleteSubscription",
+        "name": "Delete Subscriptions"
+      },
+      {
+        "value": "createSubscription",
+        "name": "Post Subscriptions"
+      }
+    ]
+  },
+  {
+    "key": "getDevice",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "getDevice.device_id",
+    "title": "Device ID",
+    "condition": "model.action === 'getDevice'"
+  },
+  {
+    "key": "sendEventToSubscribers",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "sendEventToSubscribers.device_id",
+    "title": "Device Id",
+    "condition": "model.action === 'sendEventToSubscribers'"
+  },
+  {
+    "key": "sendEventToSubscribers.percent",
+    "title": "Percent",
+    "condition": "model.action === 'sendEventToSubscribers'"
+  },
+  {
+    "key": "sendEventToSubscribers.duration_ms",
+    "title": "Duration Milliseconds",
+    "condition": "model.action === 'sendEventToSubscribers'"
+  },
+  {
+    "key": "getSubscriptions",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "getSubscriptions.subscriber_id",
+    "title": "Subscriber Id",
+    "condition": "model.action === 'getSubscriptions'"
+  },
+  {
+    "key": "getSubscriptions.publisher_id",
+    "title": "Publisher Id",
+    "condition": "model.action === 'getSubscriptions'"
+  },
+  {
+    "key": "deleteSubscription",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "deleteSubscription.subscriber_id",
+    "title": "Subscriber Id",
+    "condition": "model.action === 'deleteSubscription'"
+  },
+  {
+    "key": "deleteSubscription.publisher_id",
+    "title": "Publisher Id",
+    "condition": "model.action === 'deleteSubscription'"
+  },
+  {
+    "key": "createSubscription",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "createSubscription.subscriber_id",
+    "title": "Subscriber Id",
+    "condition": "model.action === 'createSubscription'"
+  },
+  {
+    "key": "createSubscription.publisher_id",
+    "title": "Publisher Id",
+    "condition": "model.action === 'createSubscription'"
+  },
+  {
+    "key": "createSubscription.publisher_events",
+    "title": "Publisher Events",
+    "condition": "model.action === 'createSubscription'"
+  }
+]

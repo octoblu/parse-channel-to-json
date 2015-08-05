@@ -1,0 +1,86 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "getDevice",
+        "sendEventToSubscribers",
+        "getSubscriptions",
+        "deleteSubscription",
+        "createSubscription"
+      ]
+    },
+    "getDevice": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "description": "Device ID",
+          "required": true
+        }
+      }
+    },
+    "sendEventToSubscribers": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string",
+          "description": "Device Id",
+          "required": true
+        },
+        "percent": {
+          "type": "integer",
+          "description": "Percent"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "description": "Duration Milliseconds"
+        }
+      }
+    },
+    "getSubscriptions": {
+      "type": "object",
+      "properties": {
+        "subscriber_id": {
+          "type": "string",
+          "description": "Subscriber Id"
+        },
+        "publisher_id": {
+          "type": "string",
+          "description": "Publisher Id"
+        }
+      }
+    },
+    "deleteSubscription": {
+      "type": "object",
+      "properties": {
+        "subscriber_id": {
+          "type": "string",
+          "description": "Subscriber Id"
+        },
+        "publisher_id": {
+          "type": "string",
+          "description": "Publisher Id"
+        }
+      }
+    },
+    "createSubscription": {
+      "type": "object",
+      "properties": {
+        "subscriber_id": {
+          "type": "string",
+          "description": "Subscriber Id"
+        },
+        "publisher_id": {
+          "type": "string",
+          "description": "Publisher Id"
+        },
+        "publisher_events": {
+          "type": "string",
+          "description": "Publisher Events"
+        }
+      }
+    }
+  }
+}
