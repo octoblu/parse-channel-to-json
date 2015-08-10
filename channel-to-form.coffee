@@ -2,6 +2,7 @@ _ = require 'lodash'
 
 class ChannelToForm
   transform: (channel) =>
+    return unless channel?
     @getForm channel?.application?.resources
 
   getForm: (resources) =>

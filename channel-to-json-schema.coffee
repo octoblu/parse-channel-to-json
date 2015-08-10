@@ -2,10 +2,11 @@ _ = require 'lodash'
 
 class ChannelToJsonSchema
   transform: (channel) =>
+    return unless channel?
     @getMessageSchema channel?.application?.resources
 
-  getMessageSchema: (resources)=>
-    subschemas = _.pluck resources, 'subschema'
+  getMessageSchema: (resources) =>
+    subschemas = _.pluck resources, 'action'
     messageSchema =
       type: 'object'
       properties:
@@ -22,8 +23,7 @@ class ChannelToJsonSchema
     messageSchema
 
   getSubschemaProperties: (resources, subschema) =>
-    console.log 'resources', resources, 'subschema', subschema
-    resource = _.findWhere resources, subschema: subschema
+    resource = _.findWhere resources, action: subschema
     properties = {}
     _.each resource.params, (param) =>
       properties["#{@sanitizeParam param.name}"] = @convertParam param
