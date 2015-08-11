@@ -18,21 +18,21 @@ class ChannelToForm
 
   getFormFromResource: (resource) =>
     form = [
-      key: "#{resource.subschema}"
+      key: "#{resource.action}"
       notitle: true
       type: 'hidden'
     ]
 
     _.each resource.params, (param) =>
-      form.push(@getFormFromParam resource.subschema, param)
+      form.push(@getFormFromParam resource.action, param)
 
     form
 
-  getFormFromParam: (subschema, param) =>
+  getFormFromParam: (action, param) =>
     formParam =
-      key: "#{subschema}.#{@sanitizeParam param.name}"
+      key: "#{action}.#{@sanitizeParam param.name}"
       title: param.displayName
-      condition: "model.subschema === '#{subschema}'"
+      condition: "model.subschema === '#{action}'"
       required: param.required
 
     if param.hidden?
@@ -43,7 +43,7 @@ class ChannelToForm
 
   getSubschemaTitleMap: (resources) =>
     _.map resources, (resource) =>
-      value: resource.subschema, name: resource.displayName
+      value: resource.action, name: resource.displayName
 
   convertFormParam: (param, url, method) =>
     formParam =

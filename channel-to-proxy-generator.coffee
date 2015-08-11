@@ -22,7 +22,7 @@ class ChannelGeneratorFile
     properties
 
   sanitizeParam: (param) =>
-    param.replace(/^:/, '')
+    param.replace /^:/, ''
 
   convertParam: (param) =>
     resourceParam =

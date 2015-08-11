@@ -1,0 +1,110 @@
+[
+  {
+    "key": "subschema",
+    "title": "Action",
+    "titleMap": [
+      {
+        "value": "getDevice",
+        "name": "Returns An Array Of Device Objects"
+      },
+      {
+        "value": "sendEventToSubscribers",
+        "name": "Post Devices Output"
+      },
+      {
+        "value": "getSubscriptions",
+        "name": "Gets An Array Of Subscription Objects"
+      },
+      {
+        "value": "deleteSubscription",
+        "name": "Delete Subscriptions"
+      },
+      {
+        "value": "createSubscription",
+        "name": "Post Subscriptions"
+      }
+    ]
+  },
+  {
+    "key": "getDevice",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "getDevice.device_id",
+    "title": "Device ID",
+    "condition": "model.subschema === 'getDevice'",
+    "required": true
+  },
+  {
+    "key": "sendEventToSubscribers",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "sendEventToSubscribers.device_id",
+    "title": "Device Id",
+    "condition": "model.subschema === 'sendEventToSubscribers'",
+    "required": true
+  },
+  {
+    "key": "sendEventToSubscribers.percent",
+    "title": "Percent",
+    "condition": "model.subschema === 'sendEventToSubscribers'"
+  },
+  {
+    "key": "sendEventToSubscribers.duration_ms",
+    "title": "Duration Milliseconds",
+    "condition": "model.subschema === 'sendEventToSubscribers'"
+  },
+  {
+    "key": "getSubscriptions",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "getSubscriptions.subscriber_id",
+    "title": "Subscriber Id",
+    "condition": "model.subschema === 'getSubscriptions'"
+  },
+  {
+    "key": "getSubscriptions.publisher_id",
+    "title": "Publisher Id",
+    "condition": "model.subschema === 'getSubscriptions'"
+  },
+  {
+    "key": "deleteSubscription",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "deleteSubscription.subscriber_id",
+    "title": "Subscriber Id",
+    "condition": "model.subschema === 'deleteSubscription'"
+  },
+  {
+    "key": "deleteSubscription.publisher_id",
+    "title": "Publisher Id",
+    "condition": "model.subschema === 'deleteSubscription'"
+  },
+  {
+    "key": "createSubscription",
+    "notitle": true,
+    "type": "hidden"
+  },
+  {
+    "key": "createSubscription.subscriber_id",
+    "title": "Subscriber Id",
+    "condition": "model.subschema === 'createSubscription'"
+  },
+  {
+    "key": "createSubscription.publisher_id",
+    "title": "Publisher Id",
+    "condition": "model.subschema === 'createSubscription'"
+  },
+  {
+    "key": "createSubscription.publisher_events",
+    "title": "Publisher Events",
+    "condition": "model.subschema === 'createSubscription'"
+  }
+]
