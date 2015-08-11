@@ -2,7 +2,7 @@ _ = require 'lodash'
 
 class ChannelToJsonSchema
   transform: (channel) =>
-    return unless channel?
+    return {} unless channel?
     @getMessageSchema channel?.application?.resources
 
   getMessageSchema: (resources) =>

@@ -1,33 +1,39 @@
 _ = require 'lodash'
 
-class ChannelGeneratorFile
+class ChannelToProxyGenerator
   transform: (channel) =>
-    return unless channel?
+    return {} unless channel?.application?.resources?
+
     generatorFile = name: channel.name
     @getChannelGeneratorFile channel.application.resources
 
-  getChannelGeneratorFile: (resources) =>
-    subschemas = _.pluck resources, 'action'
-    _.each subschemas, (subschema) =>
-      actionProperties = @getGeneratorForAction resources, subschema
+  getChannelGeneratorFile: (resources) =>    
+    actions = _.pluck resources, 'action'
+    generatorActions = {}
+    _.each actions, (action) =>
+      generatorActions[action] = @getGeneratorForAction resources, action
 
-    messageSchema
+    generatorActions
 
-  getGeneratorForAction: (resources, subschema) =>
-    resource = _.findWhere resources, action: subschema
-    properties = {}
+  getGeneratorForAction: (resources, action) =>
+    resource = _.findWhere resources, action: action
+    generator =
+      url: resource.url
+      httpMethod: resource.httpMethod.toLowerCase()
+      properties: {}
+
     _.each resource.params, (param) =>
-      properties["#{@sanitizeParam param.name}"] = @convertParam param
+      generator.properties["#{@sanitizeParam param.name}"] = @convertParam param
 
-    properties
+    generator
 
   sanitizeParam: (param) =>
+    console.log param
     param.replace /^:/, ''
 
   convertParam: (param) =>
     resourceParam =
-      type: param.type
-      description: param.displayName
-      required: param.required
+      style: param.style
+      name: param.name
 
-module.exports = ChannelGeneratorFile
+module.exports = ChannelToProxyGenerator

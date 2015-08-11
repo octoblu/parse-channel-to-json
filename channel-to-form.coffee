@@ -2,7 +2,7 @@ _ = require 'lodash'
 
 class ChannelToForm
   transform: (channel) =>
-    return unless channel?
+    return [] unless channel?
     @getForm channel?.application?.resources
 
   getForm: (resources) =>
@@ -59,6 +59,5 @@ class ChannelToForm
 
   sanitizeParam: (param) =>
     param.replace(/^:/, '')
-
 
 module.exports = ChannelToForm
