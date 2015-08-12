@@ -24,6 +24,8 @@ class ChannelToJsonSchema
 
   getSubschemaProperties: (resources, subschema) =>
     resource = _.findWhere resources, action: subschema
+    return unless resource?.params?
+    
     properties = {}
     _.each resource.params, (param) =>
       properties["#{@sanitizeParam param.name}"] = @convertParam param
